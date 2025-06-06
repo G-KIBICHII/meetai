@@ -3,8 +3,7 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { authClient } from "@/lib/auth-client";
-import { session } from "@/db/schema";
-import { Session } from "inspector/promises";
+import { session } from "@/db/schema"; 
 
 export default function Home() {
 
@@ -46,15 +45,62 @@ export default function Home() {
       </div>
     )
   }
+   const onLogin = () => {
+    authClient.signIn.email(
+      {
+        email,
+        password
+      },
+      {
+        onError: (error) => {
+          window.alert(
+            "something went wrong " +
+              (error.error ? error.error.toString() : "Unknown error")
+          );
+        },
+        onSuccess: () => {
+          window.alert("User created successfully");
+        },
+      }
+    );
+  };
+
+  if(session) {
+    return (
+      <div className="flex flex-col p-4 gap-y-4">
+        <p>Logged in as {session.user.name}</p>
+        <Button onClick={()=>authClient.signOut()}>Sign Out</Button>
+      </div>
+    )
+  }
 
   return (
-    <div className="p-4 flex flex-col gap-y-4">
-      <Input
-        placeholder="Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-      />
+    <div className="flex flex-col gap-y-10">
 
+
+        <div className="p-4 flex flex-col gap-y-4">
+          <Input
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+
+          <Input
+            type="email"
+            placeholder="Email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+
+          <Input
+            type="password"
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+          <Button onClick={onsubmit}>Create User</Button>
+        </div>
+        <div className="p-4 flex flex-col gap-y-4">
       <Input
         type="email"
         placeholder="Email"
@@ -68,7 +114,8 @@ export default function Home() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <Button onClick={onsubmit}>Create User</Button>
+      <Button onClick={onLogin}>Login</Button>
+    </div>
     </div>
   );
 }
